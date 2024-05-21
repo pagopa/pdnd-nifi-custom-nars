@@ -1,0 +1,11 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+      - PA-1042
+  workflow_dispatch:
+jobs:
+  call-workflow-release:
+    uses: pagopa/pdnd-github-actions/.github/workflows/release-quarkus-ms.yml@073d98cd3b8f2923156e00354fb9ed41a21f8b3a
+    secrets: inherit
