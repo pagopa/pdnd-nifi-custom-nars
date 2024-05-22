@@ -75,13 +75,15 @@ jobs:
       - name: Verify Build Output
         run: |
           echo "Contents of the target directory:"
-          ls -la target
+          ls -la
+          cd maven-shared-archive-resources
+          ls -la
 
       - name: Create Artifact Directory
         run: mkdir -p artifacts
 
       - name: Copy Build Outputs
-        run: cp target/*.nar artifacts/
+        run: cp maven-shared-archive-resources/*.nar artifacts/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
