@@ -86,8 +86,8 @@ jobs:
 
       - name: Debug
         run: |
-        ls -la
-        pwd
+          ls -la
+          pwd
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
