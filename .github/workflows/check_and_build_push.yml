@@ -93,10 +93,10 @@ jobs:
           pwd
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: /artifacts
+          path: ddbk-to-json/artifacts
 
   #semantic_release:
   #  runs-on: ubuntu-latest
