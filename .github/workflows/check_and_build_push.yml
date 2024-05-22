@@ -83,11 +83,13 @@ jobs:
           cd maven-shared-archive-resources
           ls -la
           cd ..
+          cd ..
           echo ### nifi-ddbk-to-json-nar ###
-          cd ../nifi-ddbk-to-json-nar/target
+          cd nifi-ddbk-to-json-nar/target
           ls -la
+          cd ..
           echo ### nifi-ddbk-to-json-processors ###
-          cd ../nifi-ddbk-to-json-processors
+          cd nifi-ddbk-to-json-processors
           ls -la
 
     #  - name: Create Artifact Directory
