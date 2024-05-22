@@ -72,11 +72,16 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean install
 
+      - name: Verify Build Output
+        run: |
+          echo "Contents of the target directory:"
+          ls -la target
+
       - name: Create Artifact Directory
         run: mkdir -p artifacts
 
       - name: Copy Build Outputs
-        run: cp target/*.jar artifacts/
+        run: cp target/*.nar artifacts/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
