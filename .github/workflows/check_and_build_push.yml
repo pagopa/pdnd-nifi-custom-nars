@@ -82,7 +82,7 @@ jobs:
         run: mkdir -p artifacts
 
       - name: Copy Build Outputs
-        run: cp nifi-ddbk-to-json-nar/target/nifi-ddbk-to-json-nar-1.1.0.nar*s/*.nar artifacts/
+        run: cp nifi-ddbk-to-json-nar/target/*.nar artifacts/
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
