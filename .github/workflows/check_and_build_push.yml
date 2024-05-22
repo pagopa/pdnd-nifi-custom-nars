@@ -72,6 +72,18 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean install
 
+      - name: Create Artifact Directory
+        run: mkdir -p artifacts
+
+      - name: Copy Build Outputs
+        run: cp target/*.jar artifacts/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts/
+
   #semantic_release:
   #  runs-on: ubuntu-latest
   #  timeout-minutes: 5
