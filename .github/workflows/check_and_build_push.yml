@@ -76,6 +76,8 @@ jobs:
         run: |
           echo "Contents of the target directory:"
           ls -la
+          cd target
+          ls -la
           cd maven-shared-archive-resources
           ls -la
 
