@@ -96,7 +96,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ddbk-to-json/artifacts
+          path: ${{ matrix.dir }}/artifacts
 
   #semantic_release:
   #  runs-on: ubuntu-latest
