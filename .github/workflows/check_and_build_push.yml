@@ -74,42 +74,21 @@ jobs:
 
       - name: Verify Build Output
         run: |
-          echo ### root ###
-          ls -la
-          pwd
-          echo ### target ###
-          cd target
-          ls -la
-          pwd
-          echo ### maven-shared-archive-resources ###
-          cd maven-shared-archive-resources
-          ls -la
-          pwd
-          cd ..
-          cd ..
-          pwd
           echo ### nifi-ddbk-to-json-nar ###
           cd nifi-ddbk-to-json-nar/target
           ls -la
-          pwd
-          cd ..
-          pwd
-          echo ### nifi-ddbk-to-json-processors ###
-          cd nifi-ddbk-to-json-processors/target
-          ls -la
-          pwd
 
-    #  - name: Create Artifact Directory
-    #    run: mkdir -p artifacts
-#
-    #  - name: Copy Build Outputs
-    #    run: cp maven-shared-archive-resources/*.nar artifacts/
-#
-    #  - name: Upload Artifact
-    #    uses: actions/upload-artifact@v3
-    #    with:
-    #      name: build-artifacts
-    #      path: artifacts/
+      - name: Create Artifact Directory
+        run: mkdir -p artifacts
+
+      - name: Copy Build Outputs
+        run: cp nifi-ddbk-to-json-nar/target/nifi-ddbk-to-json-nar-1.1.0.nar*s/*.nar artifacts/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts/
 
   #semantic_release:
   #  runs-on: ubuntu-latest
