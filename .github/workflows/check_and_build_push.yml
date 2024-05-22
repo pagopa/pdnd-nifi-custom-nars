@@ -76,21 +76,28 @@ jobs:
         run: |
           echo ### root ###
           ls -la
+          pwd
           echo ### target ###
           cd target
           ls -la
+          pwd
           echo ### maven-shared-archive-resources ###
           cd maven-shared-archive-resources
           ls -la
+          pwd
           cd ..
           cd ..
+          pwd
           echo ### nifi-ddbk-to-json-nar ###
-          cd nifi-ddbk-to-json-nar/target
+          cd nifi-ddbk-to-json-nar
           ls -la
+          pwd
           cd ..
+          pwd
           echo ### nifi-ddbk-to-json-processors ###
           cd nifi-ddbk-to-json-processors
           ls -la
+          pwd
 
     #  - name: Create Artifact Directory
     #    run: mkdir -p artifacts
