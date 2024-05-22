@@ -76,12 +76,13 @@ jobs:
         run: |
           echo ### root ###
           ls -la
-          echo ### trget ###
+          echo ### target ###
           cd target
           ls -la
           echo ### maven-shared-archive-resources ###
           cd maven-shared-archive-resources
           ls -la
+          cd ..
           echo ### nifi-ddbk-to-json-nar ###
           cd ../nifi-ddbk-to-json-nar
           ls -la
