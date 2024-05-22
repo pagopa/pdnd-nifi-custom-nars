@@ -78,14 +78,6 @@ jobs:
       - name: Copy Build Outputs
         run: cp nifi-ddbk-to-json-nar/target/*.nar artifacts/
 
-      - name: Debug
-        run: |
-          ls -la
-          pwd
-          cd artifacts
-          ls -la
-          pwd
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
