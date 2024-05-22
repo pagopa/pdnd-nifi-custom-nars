@@ -90,12 +90,13 @@ jobs:
           pwd
           cd artifacts
           ls -la
+          pwd
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: build-artifacts
-          path: artifacts/
+          path: /artifacts
 
   #semantic_release:
   #  runs-on: ubuntu-latest
