@@ -87,7 +87,7 @@ jobs:
           cd ../nifi-ddbk-to-json-nar/target
           ls -la
           echo ### nifi-ddbk-to-json-processors ###
-          cd ../nifi-ddbk-to-json-processors/target
+          cd ../nifi-ddbk-to-json-processors
           ls -la
 
     #  - name: Create Artifact Directory
