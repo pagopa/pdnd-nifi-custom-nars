@@ -89,13 +89,13 @@ jobs:
           cd ..
           pwd
           echo ### nifi-ddbk-to-json-nar ###
-          cd nifi-ddbk-to-json-nar
+          cd nifi-ddbk-to-json-nar/target
           ls -la
           pwd
           cd ..
           pwd
           echo ### nifi-ddbk-to-json-processors ###
-          cd nifi-ddbk-to-json-processors
+          cd nifi-ddbk-to-json-processors/target
           ls -la
           pwd
 
