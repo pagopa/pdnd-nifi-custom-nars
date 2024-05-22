@@ -88,6 +88,8 @@ jobs:
         run: |
           ls -la
           pwd
+          cd aartifcts
+          ls -la
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
