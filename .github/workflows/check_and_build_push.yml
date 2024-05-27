@@ -72,13 +72,23 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: Create Artifact Directory
-        run: mkdir -p artifacts
+      - name: Check if Module Generates NAR
+        id: check-nar
+        run: |
+          if grep -q "<packaging>nar</packaging>" pom.xml; then
+            echo "GENERATES_NAR=true" >> $GITHUB_ENV
+          else
+            echo "GENERATES_NAR=false" >> $GITHUB_ENV
+          fi
 
       - name: Copy Build Outputs
-        run: cp nifi-ddbk-to-json-nar/target/*.nar artifacts/
+        if: env.GENERATES_NAR == 'true'
+        run: |
+          mkdir -p artifacts
+          cp ${{ matrix.dir }}/target/*.nar artifacts/
 
       - name: Upload Artifact
+        if: env.GENERATES_NAR == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
