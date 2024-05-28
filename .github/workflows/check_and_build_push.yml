@@ -69,8 +69,13 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2 
 
-      - name: Build with Maven
+      - name: Build nifi-ddbk-to-json-processors
         run: mvn clean install
+        if: contains(matrix.dir, 'nifi-ddbk-to-json-processors')
+
+      - name: Build nifi-ddbk-to-json-nar
+        run: mvn clean install
+        if: contains(matrix.dir, 'nifi-ddbk-to-json-nar')
 
       - name: Check if Module Generates NAR
         id: check-nar
