@@ -67,15 +67,10 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2 
+          restore-keys: ${{ runner.os }}-m2
 
-      - name: Build nifi-ddbk-to-json-processors
-        run: mvn clean install
-        if: contains(matrix.dir, 'nifi-ddbk-to-json-processors')
-
-      - name: Build nifi-ddbk-to-json-nar
-        run: mvn clean install
-        if: contains(matrix.dir, 'nifi-ddbk-to-json-nar')
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
 
       - name: Check if Module Generates NAR
         id: check-nar
@@ -90,11 +85,11 @@ jobs:
         if: env.GENERATES_NAR == 'true'
         run: |
           mkdir -p artifacts
-          cp ${{ matrix.dir }}/target/*.nar artifacts/
+          cp target/*.nar artifacts/
 
       - name: Upload Artifact
         if: env.GENERATES_NAR == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ${{ matrix.dir }}/artifacts
+          path: artifacts
