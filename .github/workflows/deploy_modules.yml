@@ -94,8 +94,10 @@ jobs:
             fi
           done
         done
-
-
+        echo "### Final pwd"
+        pwd
+        echo "### Final artifacts ###"
+        ls artifacts
 
     - name: Upload Artifact
       if: env.GENERATES_NAR == 'true'
