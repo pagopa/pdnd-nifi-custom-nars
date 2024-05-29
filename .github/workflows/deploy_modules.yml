@@ -56,6 +56,7 @@ jobs:
 
     - name: Check for .nar files and upload artifacts
       id: check
+      shell: bash
       env:
         folders: ${{ needs.find-modules.outputs.folders}}
       run: |
@@ -63,11 +64,9 @@ jobs:
         mkdir -p artifacts
         for dir in $folders; do
           echo ${dir}
-          if [ -f "${dir}target/*.nar" ]; then
+          if [ -f "${dir}/target/*.nar" ]; then
             echo "Found .nar file in ${dir}, creating and uploading artifact..."
-            mv "${dir}target/*.nar" "artifacts/"
-            name=$(basename "${dir}")
-            path="${dir}target/${name}.nar"
+            mv "${dir}/target/*.nar" "artifacts/"
             echo "GENERATES_NAR=true" >> $GITHUB_ENV
           fi
         done
