@@ -9,16 +9,18 @@ jobs:
   find-modules:
     name: Find Modules
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ddbk-to-json
     timeout-minutes: 5
     outputs:
       folders: ${{ steps.modules.outputs.folders }}
+      
     steps:
       - uses: actions/checkout@v4
 
       - id: modules
         uses: philips-labs/list-folders-action@v2.1
-        with:
-          path: ddbk-to-json
 
   build:
     runs-on: ubuntu-latest
