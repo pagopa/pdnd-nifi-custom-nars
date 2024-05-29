@@ -60,24 +60,25 @@ jobs:
         folders: ${{ needs.find-modules.outputs.folders}}
       run: |
         echo $folders
+        mkdir -p artifacts
         for dir in $folders; do
           echo ${dir}
           if [ -f "${dir}target/*.nar" ]; then
             echo "Found .nar file in ${dir}, creating and uploading artifact..."
-            mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
+            mv "${dir}target/*.nar" "artifacts/"
             name=$(basename "${dir}")
             path="${dir}target/${name}.nar"
-            echo "::set-output name=path::${path}"
-            echo "::set-output name=name::${name}"
+            echo "GENERATES_NAR=true" >> $GITHUB_ENV
           fi
         done
-      
 
-    #- name: Upload artifact
-    #  uses: actions/upload-artifact@v2
-    #  with:
-    #    name: ${{ steps.check.outputs.name }}
-    #    path: ${{ steps.check.outputs.path }}
+    - name: Upload Artifact
+      if: env.GENERATES_NAR == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: artifacts
+
 
 
 
