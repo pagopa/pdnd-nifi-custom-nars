@@ -80,6 +80,10 @@ jobs:
         IFS=',' read -ra ADDR <<< "${folders//[\[\]\" ]/}"
         for dir in "${ADDR[@]}"; do
           echo ${dir}
+          echo "### 1. ls output ###"
+          ls -la
+          echo "### 1. pwd output ###"
+          pwd
           if [ -f "${dir}/target/*.nar" ]; then
             echo "Found .nar file in ${dir}, creating and uploading artifact..."
             mv "${dir}/target/*.nar" "artifacts/"
