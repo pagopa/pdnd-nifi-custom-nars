@@ -63,7 +63,11 @@ jobs:
     - name: Ouutput Folders
       env:
         folders: ${{ needs.find-modules.outputs.folders}}
-      run: echo $folders
+      run: |
+        IFS=',' read -ra ADDR <<< "${folders//[\[\]\" ]/}"
+        for dir in "${ADDR[@]}"; do
+          echo ${dir}
+        done
 
     - name: Check for .nar files and upload artifacts
       id: check
@@ -73,7 +77,8 @@ jobs:
       run: |
         echo $folders
         mkdir -p artifacts
-        for dir in $folders; do
+        IFS=',' read -ra ADDR <<< "${folders//[\[\]\" ]/}"
+        for dir in "${ADDR[@]}"; do
           echo ${dir}
           if [ -f "${dir}/target/*.nar" ]; then
             echo "Found .nar file in ${dir}, creating and uploading artifact..."
@@ -81,6 +86,8 @@ jobs:
             echo "GENERATES_NAR=true" >> $GITHUB_ENV
           fi
         done
+
+
 
     - name: Upload Artifact
       if: env.GENERATES_NAR == 'true'
