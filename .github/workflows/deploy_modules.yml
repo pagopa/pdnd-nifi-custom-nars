@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: ddbk-to-json
+        working-directory: "ddbk-to-json"
 
     steps:
     - uses: actions/checkout@v4
@@ -78,55 +78,3 @@ jobs:
       with:
         name: build-artifacts
         path: ddbk-to-json/artifacts/**/*
-
-
-
-
-#  artifacts:
-#    name: Upload Artifacts
-#    needs:
-#      - find-modules
-#      - build
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 30
-#    defaults:
-#      run:
-#        working-directory: ${{ matrix.folder }}
-#    strategy:
-#      matrix:
-#        folder: ${{ fromJson(needs.find-modules.outputs.folders )}}
-#    steps:
-#      - name: do something
-#        run: echo ${{ matrix.folder }}
-#
-#  artifacts1:
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 30
-#    if: ${{ needs.build.outputs.paths != '[]' }}
-#    strategy:
-#      matrix:
-#        dir: ${{ fromJSON(needs.compute_diff.outputs.changed_dirs) }}
-#    defaults:
-#      run:
-#        working-directory: ${{ matrix.dir }}
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#      - name: Set up JDK
-#        uses: actions/setup-java@v4
-#        with:
-#          distribution: 'adopt'
-#          java-version: '11'
-#          server-id: github
-#          settings-path: ${{ github.workspace }}
-#      
-#      - name: Cache Maven packages
-#        uses: actions/cache@v4
-#        with:
-#          path: ~/.m2/repository
-#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-#          restore-keys: ${{ runner.os }}-m2
-#      - name: Build with Maven
-#        run: mvn clean install -DskipTests
-#
-#  
