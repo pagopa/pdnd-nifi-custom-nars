@@ -96,6 +96,8 @@ jobs:
         done
         echo "### Final pwd"
         pwd
+        echo "### Final ls"
+        ls 'la'
         echo "### Final artifacts ###"
         ls artifacts
 
