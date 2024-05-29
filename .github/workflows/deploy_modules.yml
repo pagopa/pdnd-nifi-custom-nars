@@ -97,7 +97,7 @@ jobs:
         echo "### Final pwd"
         pwd
         echo "### Final ls"
-        ls 'la'
+        ls -la
         echo "### Final artifacts ###"
         ls artifacts
 
