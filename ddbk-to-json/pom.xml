@@ -31,4 +31,12 @@
         <module>nifi-ddbk-to-json-nar</module>
     </modules>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/pagopa/pdnd-nifi-custom-nars</url>
+        </repository>
+    </distributionManagement>
+
 </project>
