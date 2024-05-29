@@ -9,9 +9,6 @@ jobs:
   find-modules:
     name: Find Modules
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ddbk-to-json
     timeout-minutes: 5
     outputs:
       folders: ${{ steps.modules.outputs.folders }}
@@ -22,6 +19,8 @@ jobs:
       - name: List Sub-Folders
         id: modules
         uses: kmanimaran/list-folder-action@v4
+        with:
+          path: ddbk-to-json
 
       - name: Folders
         shell: bash
