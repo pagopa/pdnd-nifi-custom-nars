@@ -54,6 +54,14 @@ jobs:
     - name: Build with Maven
       run: mvn clean install
 
+    - name: Verify Build Output
+      run: |
+        pwd 
+        ls -la
+       #echo ### nifi-ddbk-to-json-nar ###
+       #cd nifi-ddbk-to-json-nar/target
+       #ls -la
+
     - name: Check for .nar files and upload artifacts
       id: check
       shell: bash
