@@ -15,12 +15,12 @@ jobs:
     timeout-minutes: 5
     outputs:
       folders: ${{ steps.modules.outputs.folders }}
-      
+
     steps:
       - uses: actions/checkout@v4
 
       - id: modules
-        uses: philips-labs/list-folders-action@v2.1
+        uses: philips-labs/list-folders-action@v2
 
   build:
     runs-on: ubuntu-latest
