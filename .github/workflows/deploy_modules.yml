@@ -77,7 +77,7 @@ jobs:
       if: env.GENERATES_NAR == 'true'
       with:
         name: build-artifacts
-        path: artifacts/**/*
+        path: ddbk-to-json/artifacts/**/*
 
 
 
