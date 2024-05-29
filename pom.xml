@@ -36,12 +36,11 @@
         </dependencies>
     </dependencyManagement>
 
-    <distributionManagement>
+    <repositories>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/pagopa/pdnd-nifi-custom-nars</url>
         </repository>
-    </distributionManagement>
+    </repositories>
 
 </project>

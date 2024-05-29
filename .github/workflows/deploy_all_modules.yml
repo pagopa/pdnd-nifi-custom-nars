@@ -10,7 +10,8 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
+        working-directory: ddbk-to-json
+        #working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
 
     steps:
       - name: Checkout
@@ -44,10 +45,10 @@ jobs:
                   </servers>
                 </settings>" > ~/.m2/settings.xml
 
-      #- name: Publish to GitHub Packages Apache Maven
-      #  run: mvn clean deploy 
-      #  env:
-      #    GITHUB_TOKEN: ${{ github.token }}
-
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean install
+        
+      - name: Deploy to GitHub Packages
+        run: mvn deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
