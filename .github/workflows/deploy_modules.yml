@@ -58,9 +58,11 @@ jobs:
       run: |
         pwd 
         ls -la
-       #echo ### nifi-ddbk-to-json-nar ###
-       #cd nifi-ddbk-to-json-nar/target
-       #ls -la
+
+    - name: Ouutput Folders
+      env:
+        folders: ${{ needs.find-modules.outputs.folders}}
+      run: echo $folders
 
     - name: Check for .nar files and upload artifacts
       id: check
