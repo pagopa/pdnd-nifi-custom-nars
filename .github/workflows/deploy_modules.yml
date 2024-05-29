@@ -1,0 +1,46 @@
+name: Build and Upload Artifacts
+
+on:
+  push:
+    branches:
+      - PA-1042
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ddbk-to-json
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Check for .nar files and upload artifacts
+      run: |
+        for dir in $(ls -d */); do
+          if [ -f "${dir}target/*.nar" ]; then
+            echo "Found .nar file in ${dir}, creating and uploading artifact..."
+            mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
+            name=$(basename "${dir}")
+            path="${dir}target/${name}.nar"
+            echo "::set-output name=path::${path}"
+            echo "::set-output name=name::${name}"
+          fi
+        done
+      id: check
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ steps.check.outputs.name }}
+        path: ${{ steps.check.outputs.path }}
