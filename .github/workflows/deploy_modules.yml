@@ -6,6 +6,20 @@ on:
       - PA-1042
 
 jobs:
+  find-modules:
+    name: Find Modules
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      folders: ${{ steps.modules.outputs.folders }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: modules
+        uses: philips-labs/list-folders-action@v2.1
+        with:
+          path: ddbk-to-json
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -22,25 +36,87 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
 
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
     - name: Check for .nar files and upload artifacts
-      run: |
-        for dir in $(ls -d */); do
-          if [ -f "${dir}target/*.nar" ]; then
-            echo "Found .nar file in ${dir}, creating and uploading artifact..."
-            mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
-            name=$(basename "${dir}")
-            path="${dir}target/${name}.nar"
-            echo "::set-output name=path::${path}"
-            echo "::set-output name=name::${name}"
-          fi
-        done
       id: check
+      env:
+        folders: ${{ needs.find-modules.outputs.folders}}
+      run: |
+        echo $folders
+        #for dir in $(ls -d */); do
+        #  if [ -f "${dir}target/*.nar" ]; then
+        #    echo "Found .nar file in ${dir}, creating and uploading artifact..."
+        #    mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
+        #    name=$(basename "${dir}")
+        #    path="${dir}target/${name}.nar"
+        #    echo "::set-output name=path::${path}"
+        #    echo "::set-output name=name::${name}"
+        #  fi
+        #done
+      
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ steps.check.outputs.name }}
-        path: ${{ steps.check.outputs.path }}
+    #- name: Upload artifact
+    #  uses: actions/upload-artifact@v2
+    #  with:
+    #    name: ${{ steps.check.outputs.name }}
+    #    path: ${{ steps.check.outputs.path }}
+
+
+
+#  artifacts:
+#    name: Upload Artifacts
+#    needs:
+#      - find-modules
+#      - build
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 30
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.folder }}
+#    strategy:
+#      matrix:
+#        folder: ${{ fromJson(needs.find-modules.outputs.folders )}}
+#    steps:
+#      - name: do something
+#        run: echo ${{ matrix.folder }}
+#
+#  artifacts1:
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 30
+#    if: ${{ needs.build.outputs.paths != '[]' }}
+#    strategy:
+#      matrix:
+#        dir: ${{ fromJSON(needs.compute_diff.outputs.changed_dirs) }}
+#    defaults:
+#      run:
+#        working-directory: ${{ matrix.dir }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#      - name: Set up JDK
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: 'adopt'
+#          java-version: '11'
+#          server-id: github
+#          settings-path: ${{ github.workspace }}
+#      
+#      - name: Cache Maven packages
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-m2
+#      - name: Build with Maven
+#        run: mvn clean install -DskipTests
+#
+#  
