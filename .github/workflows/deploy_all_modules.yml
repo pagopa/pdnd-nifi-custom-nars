@@ -11,7 +11,7 @@ jobs:
     defaults:
       run:
         #working-directory: ddbk-to-json
-        working-directory: ddbk-to-json/nifi-ddbk-to-json-processor
+        working-directory: ddbk-to-json/nifi-ddbk-to-json-processors
         #working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
 
     steps:
