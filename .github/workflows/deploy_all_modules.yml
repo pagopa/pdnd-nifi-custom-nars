@@ -10,7 +10,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: ddbk-to-json
+        working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
 
     steps:
       - name: Checkout
