@@ -22,6 +22,11 @@ jobs:
       - name: List Sub-Folders
         id: modules
         uses: kmanimaran/list-folder-action@v4
+
+      - name: Folders
+        shell: bash
+        run: |
+            echo ${{ steps.modules.outputs.folders }}
     
 
   build:
