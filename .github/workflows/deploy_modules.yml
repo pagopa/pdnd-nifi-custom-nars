@@ -82,8 +82,10 @@ jobs:
           echo ${dir}
           echo "### 1. ls output ###"
           ls -la
-          echo "### 1. pwd output ###"
+          echo "### 2. pwd output ###"
           pwd
+          echo "### 3. ls ${dir} output ###"
+          ls ${dir}
           if [ -f "${dir}/target/*.nar" ]; then
             echo "Found .nar file in ${dir}, creating and uploading artifact..."
             mv "${dir}/target/*.nar" "artifacts/"
