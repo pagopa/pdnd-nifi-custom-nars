@@ -106,7 +106,7 @@ jobs:
       if: env.GENERATES_NAR == 'true'
       with:
         name: build-artifacts
-        path: ${{ github.workspace }}/artifacts/**/*
+        path: ${{ github.workspace }}/ddbk-to-json/artifacts/**/*
 
 
 
