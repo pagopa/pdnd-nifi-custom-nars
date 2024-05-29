@@ -86,11 +86,13 @@ jobs:
           pwd
           echo "### 3. ls ${dir}/target output ###"
           ls ${dir}/target
-          if [ -f "${dir}/target/*.nar" ]; then
-            echo "Found .nar file in ${dir}, creating and uploading artifact..."
-            mv "${dir}/target/*.nar" "artifacts/"
-            echo "GENERATES_NAR=true" >> $GITHUB_ENV
-          fi
+          for file in "${dir}/target/"*.nar; do
+            if [ -f "$file" ]; then
+              echo "Found .nar file in ${dir}, creating and uploading artifact..."
+              mv "$file" "artifacts/"
+              echo "GENERATES_NAR=true" >> $GITHUB_ENV
+            fi
+          done
         done
 
 
