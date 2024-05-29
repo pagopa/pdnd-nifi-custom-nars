@@ -8,11 +8,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    defaults:
-      run:
-        #working-directory: ddbk-to-json
-        working-directory: ddbk-to-json/nifi-ddbk-to-json-processors
-        #working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
+    #defaults:
+    #  run:
+    #    #working-directory: ddbk-to-json
+    #    working-directory: ddbk-to-json/nifi-ddbk-to-json-processors
+    #    #working-directory: ddbk-to-json/nifi-ddbk-to-json-nar
 
     steps:
       - name: Checkout
