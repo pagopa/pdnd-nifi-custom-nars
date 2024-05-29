@@ -60,16 +60,17 @@ jobs:
         folders: ${{ needs.find-modules.outputs.folders}}
       run: |
         echo $folders
-        #for dir in $(ls -d */); do
-        #  if [ -f "${dir}target/*.nar" ]; then
-        #    echo "Found .nar file in ${dir}, creating and uploading artifact..."
-        #    mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
-        #    name=$(basename "${dir}")
-        #    path="${dir}target/${name}.nar"
-        #    echo "::set-output name=path::${path}"
-        #    echo "::set-output name=name::${name}"
-        #  fi
-        #done
+        for dir in $folders; do
+          echo ${dir}
+          if [ -f "${dir}target/*.nar" ]; then
+            echo "Found .nar file in ${dir}, creating and uploading artifact..."
+            mv "${dir}target/*.nar" "${dir}target/${dir%.}/.nar"
+            name=$(basename "${dir}")
+            path="${dir}target/${name}.nar"
+            echo "::set-output name=path::${path}"
+            echo "::set-output name=name::${name}"
+          fi
+        done
       
 
     #- name: Upload artifact
