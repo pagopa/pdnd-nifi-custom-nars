@@ -84,9 +84,13 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
-      - name: Run semantic-release
-        uses: docker://ghcr.io/crazy-max/ghaction-docker-buildx:latest
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          entrypoint: /usr/local/bin/semantic-release
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run semantic-release
