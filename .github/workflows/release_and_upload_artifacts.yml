@@ -1,0 +1,79 @@
+name: Build and Upload Artifacts
+
+on:
+  push:
+    branches:
+      - PA-1042
+
+jobs:
+  find-modules:
+    name: Find Modules
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      folders: ${{ steps.modules.outputs.folders }}
+    env:
+      WORKING_DIRECTORY: ddbk-to-json
+    steps:
+      - uses: actions/checkout@v4
+      - name: List Sub-Folders
+        id: modules
+        uses: kmanimaran/list-folder-action@v4
+        with:
+          path: ${{ env.WORKING_DIRECTORY }}
+      - name: finded modules
+        shell: bash
+        run: |
+            echo ${{ steps.modules.outputs.folders }}
+
+  build:
+    name: Build 
+    runs-on: ubuntu-latest
+    needs: find-modules
+    timeout-minutes: 30
+    env:
+      WORKING_DIRECTORY: ddbk-to-json
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    - name: Build with Maven
+      run: mvn clean install
+    - name: Check for .nar files and upload artifacts
+      id: check
+      shell: bash
+      env:
+        folders: ${{ needs.find-modules.outputs.folders}}
+      run: |
+        mkdir -p artifacts
+        IFS=',' read -ra ADDR <<< "${folders//[\[\]\" ]/}"
+        for dir in "${ADDR[@]}"; do
+          for file in "${dir}/target/"*.nar; do
+            if [ -f "$file" ]; then
+              echo "Found .nar file in ${dir}, creating and uploading artifact..."
+              mv "$file" "artifacts/"
+              echo "GENERATES_NAR=true" >> $GITHUB_ENV
+            fi
+          done
+        done
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      if: env.GENERATES_NAR == 'true'
+      with:
+        name: build-artifacts
+        path: ${{ env.WORKING_DIRECTORY }}/artifacts/**/*
+    - uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
