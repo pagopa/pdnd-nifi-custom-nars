@@ -3,7 +3,7 @@ name: Build and Upload Artifacts
 on:
   push:
     branches:
-      - PA-1042
+      - main
 
 jobs:
   find-modules:
