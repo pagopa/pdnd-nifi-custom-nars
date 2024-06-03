@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/pagopa/pdnd-nifi-custom-nars/compare/v1.0.0...v1.0.1) (2024-06-03)
+
+
+### Bug Fixes
+
+* test validate pr and check pr ([77df44c](https://github.com/pagopa/pdnd-nifi-custom-nars/commit/77df44cb0b56186e595b334d1ab0e4e97e485a80))
+
 # 1.0.0 (2024-05-30)
 
 
