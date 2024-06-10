@@ -40,8 +40,13 @@ jobs:
     timeout-minutes: 5
     outputs:
       folders: ${{ steps.modules.outputs.folders }}
-    env:
-      WORKING_DIRECTORY: ddbk-to-json
+    strategy:
+      matrix: 
+        WORKING_DIRECTORY: ${{ fromJSON(needs.compute_diff.outputs.changed_dirs) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.WORKING_DIRECTORY }}
+
     steps:
       - uses: actions/checkout@v4
       - name: List Sub-Folders
@@ -61,11 +66,12 @@ jobs:
       - compute_diff
       - find-modules
     timeout-minutes: 30
-    env:
-      WORKING_DIRECTORY: ddbk-to-json
+    strategy:
+      matrix: 
+        WORKING_DIRECTORY: ${{ fromJSON(needs.compute_diff.outputs.changed_dirs) }}
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ${{ matrix.WORKING_DIRECTORY }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK
