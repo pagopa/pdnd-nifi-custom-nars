@@ -60,6 +60,7 @@ jobs:
   build:
     name: Build and Upload Artifacts
     runs-on: ubuntu-latest
+    if: ${{ needs.compute_diff.outputs.changed_dirs != '[]' }}
     needs: 
       - compute_diff
       - find-modules
