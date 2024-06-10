@@ -108,7 +108,7 @@ jobs:
       if: env.GENERATES_NAR == 'true'
       with:
         name: build-artifacts
-        path: ${{ env.WORKING_DIRECTORY }}/artifacts/**/*
+        path: ${{ matrix.dir }}/artifacts/**/*
     - uses: actions/download-artifact@v4
       with:
         name: build-artifacts
