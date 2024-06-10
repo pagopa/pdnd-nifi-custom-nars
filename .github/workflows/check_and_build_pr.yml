@@ -20,8 +20,6 @@ jobs:
           matrix: true
           quotepath: false
           files_ignore: .github/**
-          #files: |
-          #  libs/**
       - name: Filter directories
         id: filter-dirs
         shell: bash
