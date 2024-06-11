@@ -58,7 +58,7 @@ jobs:
             echo ${{ steps.modules.outputs.folders }}
 
   build:
-    name: Build and Upload Artifacts
+    name: Build
     runs-on: ubuntu-latest
     if: ${{ needs.compute_diff.outputs.changed_dirs != '[]' }}
     needs: 
