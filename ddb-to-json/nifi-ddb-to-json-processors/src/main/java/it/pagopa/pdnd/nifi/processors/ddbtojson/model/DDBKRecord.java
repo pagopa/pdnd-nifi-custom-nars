@@ -1,4 +1,4 @@
-package it.pagopa.pdnd.nifi.processors.ddbktojson.model;
+package it.pagopa.pdnd.nifi.processors.ddbtojson.model;
 
 import com.amazonaws.services.dynamodbv2.model.Record;
 

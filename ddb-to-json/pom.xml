@@ -22,13 +22,13 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>ddbk-to-json</artifactId>
-    <version>1.1.0</version>
+    <artifactId>ddb-to-json</artifactId>
+    <version>1.2.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>nifi-ddbk-to-json-processors</module>
-        <module>nifi-ddbk-to-json-nar</module>
+        <module>nifi-ddb-to-json-processors</module>
+        <module>nifi-ddb-to-json-nar</module>
     </modules>
 
     <repositories>
