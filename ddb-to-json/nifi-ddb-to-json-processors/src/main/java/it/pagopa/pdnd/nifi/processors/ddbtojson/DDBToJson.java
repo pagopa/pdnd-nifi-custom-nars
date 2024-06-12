@@ -1,20 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package it.pagopa.pdnd.nifi.processors.ddbktojson;
+package it.pagopa.pdnd.nifi.processors.ddbtojson;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
@@ -24,7 +8,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import it.pagopa.pdnd.nifi.processors.ddbktojson.model.DDBKRecord;
+import it.pagopa.pdnd.nifi.processors.ddbtojson.model.DDBKRecord;
+import com.amazonaws.services.dynamodbv2.model.StreamRecord;
+import org.apache.nifi.components.AllowableValue;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -32,6 +18,7 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.*;
+import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.stream.io.StreamUtils;
 import org.apache.nifi.util.StopWatch;
 import org.apache.nifi.util.StringUtils;
@@ -39,20 +26,21 @@ import org.apache.nifi.util.StringUtils;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@Tags({"DynamoDB", "Convert", "JSON", "Read", "Kinesis"})
+@Tags({"DynamoDB", "Convert", "JSON", "Read"})
 @CapabilityDescription("Converts a DynamoDB JSON format in a plain JSON. Saves the root metadata in attributes starting with ddbk_* prefix")
 @WritesAttributes({
-        @WritesAttribute(attribute = DDBKToJson.DDBK_AWS_REGION, description = "AWS Region saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_EVENT_ID, description = "Event ID saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_EVENT_NAME, description = "Event Name saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_EVENT_SOURCE, description = "Event Source saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_EVENT_VERSION, description = "Event Version saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_PRINCIPAL_ID, description = "If UserIdentity is not null: Principal ID saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_PRINCIPAL_TYPE, description = "If UserIdentity is not null: Principal Type saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_RECORD_FORMAT, description = "Record Format saved on DynamoDB JSON"),
-        @WritesAttribute(attribute = DDBKToJson.DDBK_TABLE_NAME, description = "Table name saved on DynamoDB JSON")
+        @WritesAttribute(attribute = DDBToJson.DDBK_AWS_REGION, description = "AWS Region saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_EVENT_ID, description = "Event ID saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_EVENT_NAME, description = "Event Name saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_EVENT_SOURCE, description = "Event Source saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_EVENT_VERSION, description = "Event Version saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_PRINCIPAL_ID, description = "If UserIdentity is not null: Principal ID saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_PRINCIPAL_TYPE, description = "If UserIdentity is not null: Principal Type saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_RECORD_FORMAT, description = "Record Format saved on DynamoDB JSON"),
+        @WritesAttribute(attribute = DDBToJson.DDBK_TABLE_NAME, description = "Table name saved on DynamoDB JSON")
 })
-public class DDBKToJson extends AbstractProcessor {
+
+public class DDBToJson extends AbstractProcessor {
     public static final String DDBK_PRINCIPAL_TYPE = "ddbk_principal_type";
     public static final String DDBK_PRINCIPAL_ID = "ddbk_principal_id";
     public static final String DDBK_EVENT_VERSION = "ddbk_event_version";
@@ -84,6 +72,20 @@ public class DDBKToJson extends AbstractProcessor {
             .name("warning")
             .build();
 
+    public static final AllowableValue KYNESIS = new AllowableValue("kynesis", "kynesis",
+            "Converts a DynamoDB JSON using kynesis");
+
+    public static final AllowableValue EXPORT = new AllowableValue("export", "export",
+            "Converts a DynamoDB JSON using export");
+
+    public static final PropertyDescriptor PROP_CONVERT = new PropertyDescriptor.Builder()
+            .name("input-format")
+            .description("Select input format")
+            .displayName("Input format")
+            .allowableValues(KYNESIS,EXPORT)
+            .required(true)
+            .defaultValue(KYNESIS.getValue())
+            .build();
 
     private List<PropertyDescriptor> descriptors;
 
@@ -92,6 +94,7 @@ public class DDBKToJson extends AbstractProcessor {
     @Override
     protected void init(final ProcessorInitializationContext context) {
         descriptors = new ArrayList<>();
+        descriptors.add(PROP_CONVERT);
         descriptors = Collections.unmodifiableList(descriptors);
 
         relationships = new HashSet<>();
@@ -113,59 +116,63 @@ public class DDBKToJson extends AbstractProcessor {
 
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) {
+        String propertyValue = context.getProperty(PROP_CONVERT).getValue();
         FlowFile flowFile = session.get();
         if (flowFile == null) {
             return;
         }
+
         final StopWatch stopWatch = new StopWatch(true);
-
         String contentString = extractContent(session, flowFile);
-
-        DDBKRecord deserialized;
-        try {
-            deserialized = MAPPER.readValue(contentString, DDBKRecord.class);
-        } catch (JsonProcessingException e) {
-            getLogger().error("Failed to parse input FlowFile {} due to {}", flowFile, e);
-            session.transfer(flowFile, REL_FAILURE);
-            return;
-        }
-
-        if (deserialized == null || deserialized.getDynamodb() == null || deserialized.getDynamodb().getNewImage() == null) {
-            getLogger().warn("Empty new image for FlowFile {}", flowFile);
-            session.transfer(flowFile, REL_WARN);
-            return;
-        }
-
         String outJson;
-        try {
-            outJson = prepareOutputJson(deserialized);
-        } catch (JsonProcessingException e) {
-            getLogger().error("Failed to add fields to outputJson {} due to {}", flowFile, e);
-            session.transfer(flowFile, REL_FAILURE);
-            return;
-        }
-
-        FlowFile resultFlowFile = session.write(flowFile, outputStream -> outputStream.write(outJson.getBytes()));
-
-        //TODO Adds other getDynamoDB values?
         final Map<String, String> attributes = new HashMap<>();
-        addAttributes(deserialized, attributes);
-        resultFlowFile = session.putAllAttributes(resultFlowFile, attributes);
 
-        getLogger().info("Transferred {} to 'success'", flowFile);
-        session.getProvenanceReporter().modifyContent(flowFile, stopWatch.getElapsed(TimeUnit.MILLISECONDS));
-        session.transfer(resultFlowFile, REL_SUCCESS);
+        try {
+            if (KYNESIS.getValue().equals(propertyValue)) {
+                DDBKRecord deserialized = MAPPER.readValue(contentString, DDBKRecord.class);
+                if (deserialized == null || deserialized.getDynamodb() == null || deserialized.getDynamodb().getNewImage() == null) {
+                    getLogger().warn("Empty new image for FlowFile {}", new Object[]{flowFile});
+                    session.transfer(flowFile, REL_WARN);
+                    return;
+                }
+                addAttributes(deserialized, attributes);
+                outJson = prepareOutputJson(deserialized);
+            } else if (EXPORT.getValue().equals(propertyValue)) {
+                StreamRecord deserialized = MAPPER.readValue(contentString, StreamRecord.class);
+                if (deserialized == null || deserialized.getNewImage() == null) {
+                    getLogger().warn("Empty new image for FlowFile {}", new Object[]{flowFile});
+                    session.transfer(flowFile, REL_WARN);
+                    return;
+                }
+                outJson = prepareOutputJson(deserialized);
+            } else {
+                throw new ProcessException("Unknown listing strategy: " + propertyValue);
+            }
+
+            FlowFile resultFlowFile = session.write(flowFile, outputStream -> outputStream.write(outJson.getBytes()));
+
+            resultFlowFile = session.putAllAttributes(resultFlowFile, attributes);
+            session.getProvenanceReporter().modifyContent(resultFlowFile, stopWatch.getElapsed(TimeUnit.MILLISECONDS));
+            session.transfer(resultFlowFile, REL_SUCCESS);
+            getLogger().info("Transferred {} to 'success'", new Object[]{flowFile});
+        } catch (Exception e) {
+            getLogger().error("Failed to process FlowFile {} due to {}", new Object[]{flowFile, e});
+            session.transfer(flowFile, REL_FAILURE);
+        }
+    }
+
+    private static String prepareOutputJson(StreamRecord deserialized) throws JsonProcessingException {
+        Item ddbItem = ItemUtils.toItem(deserialized.getNewImage());
+        JsonNode jsonNode = MAPPER.readTree(ddbItem.toJSON());
+        return jsonNode.toString();
     }
 
     private static String prepareOutputJson(DDBKRecord deserialized) throws JsonProcessingException {
         Item ddbItem = ItemUtils.toItem(deserialized.getDynamodb().getNewImage());
-        String outJson;
-        JsonNode jsonNode = MAPPER.readTree(ddbItem.toJSON());
-        outJson = ((ObjectNode) jsonNode)
-                        .put("eventID", deserialized.getEventID())
-                        .put("eventName", deserialized.getEventName())
-                .toString();
-        return outJson;
+        ObjectNode jsonNode = (ObjectNode) MAPPER.readTree(ddbItem.toJSON());
+        jsonNode.put("eventID", deserialized.getEventID())
+                .put("eventName", deserialized.getEventName());
+        return jsonNode.toString();
     }
 
     private static String extractContent(ProcessSession session, FlowFile flowFile) {
@@ -198,5 +205,4 @@ public class DDBKToJson extends AbstractProcessor {
             attributes.put(key, value);
         }
     }
-
 }
