@@ -19,7 +19,7 @@
     <parent>
         <groupId>it.pagopa.pdnd.nifi</groupId>
         <artifactId>ddb-to-json</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.1</version>
     </parent>
 
     <artifactId>nifi-ddb-to-json-processors</artifactId>

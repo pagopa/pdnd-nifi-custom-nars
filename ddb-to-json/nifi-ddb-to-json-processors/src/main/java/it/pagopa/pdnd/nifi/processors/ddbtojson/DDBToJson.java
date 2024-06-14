@@ -46,6 +46,8 @@ public class DDBToJson extends AbstractProcessor {
     public static final String DDBK_TABLE_NAME = "ddbk_table_name";
     private static final RecordObjectMapper MAPPER;
 
+    private Parser parser;
+
     static {
         MAPPER = new RecordObjectMapper();
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -113,8 +115,10 @@ public class DDBToJson extends AbstractProcessor {
 
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) {
-        String parserType = context.getProperty(PROP_CONVERT).getValue();
-        Parser parser = ParserFactory.createParser(parserType, MAPPER, getLogger());
+        if(parser == null) {
+            String parserType = context.getProperty(PROP_CONVERT).getValue();
+            parser = ParserFactory.createParser(parserType, MAPPER, getLogger());
+        }
 
 
         FlowFile flowFile = session.get();
