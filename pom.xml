@@ -24,6 +24,7 @@
 
     <modules>
         <module>ddb-to-json</module>
+        <module>query-all-sf</module>
     </modules>
 
     <dependencyManagement>
