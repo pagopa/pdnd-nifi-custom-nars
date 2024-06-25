@@ -55,8 +55,9 @@ public class SalesforceRestService {
         return request(request);
     }
 
-    public InputStream query(String query) {
-        String url = getVersionedBaseUrl() + "/query";
+    public InputStream query(String query, boolean queryAll) {
+        String endpoint = queryAll ? "/queryAll" : "/query";
+        String url = getVersionedBaseUrl() + endpoint;
 
         HttpUrl httpUrl = HttpUrl.get(url).newBuilder()
                 .addQueryParameter("q", query)
