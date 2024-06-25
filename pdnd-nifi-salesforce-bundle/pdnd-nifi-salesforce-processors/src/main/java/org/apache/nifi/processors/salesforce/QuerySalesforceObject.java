@@ -243,6 +243,15 @@ public class QuerySalesforceObject extends AbstractProcessor {
             .autoTerminateDefault(true)
             .build();
 
+    static final PropertyDescriptor QUERY_ALL = new PropertyDescriptor.Builder()
+            .name("query-all")
+            .displayName("Query All")
+            .description("Specify whether to query all records, including deleted records.")
+            .required(true)
+            .defaultValue("false")
+            .allowableValues("true", "false")
+            .build();
+
     private static final String LAST_AGE_FILTER = "last_age_filter";
     private static final String STARTING_FIELD_NAME = "records";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -293,7 +302,8 @@ public class QuerySalesforceObject extends AbstractProcessor {
             CUSTOM_WHERE_CONDITION,
             READ_TIMEOUT,
             CREATE_ZERO_RECORD_FILES,
-            TOKEN_PROVIDER
+            TOKEN_PROVIDER,
+            QUERY_ALL
     ));
 
     private static final Set<Relationship> RELATIONSHIPS = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
@@ -343,6 +353,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
     }
 
     private void processQuery(ProcessContext context, ProcessSession session) {
+        boolean queryAll = context.getProperty(QUERY_ALL).asBoolean();
         AtomicReference<String> nextRecordsUrl = new AtomicReference<>();
         String sObject = context.getProperty(SOBJECT_NAME).getValue();
         String fields = context.getProperty(FIELD_NAMES).getValue();
@@ -404,7 +415,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
             long startNanos = System.nanoTime();
             flowFile = session.write(flowFile, out -> {
                 try (
-                        InputStream querySObjectResultInputStream = getResultInputStream(nextRecordsUrl.get(), querySObject);
+                        InputStream querySObjectResultInputStream = getResultInputStream(nextRecordsUrl.get(), querySObject, queryAll);
 
                         JsonTreeRowRecordReader jsonReader = new JsonTreeRowRecordReader(
                                 querySObjectResultInputStream,
@@ -479,6 +490,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
     }
 
     private void processCustomQuery(ProcessContext context, ProcessSession session, FlowFile originalFlowFile) {
+        boolean queryAll = context.getProperty(QUERY_ALL).asBoolean();
         String customQuery = context.getProperty(CUSTOM_SOQL_QUERY).evaluateAttributeExpressions(originalFlowFile).getValue();
         AtomicReference<String> nextRecordsUrl = new AtomicReference<>();
         AtomicReference<String> totalSize = new AtomicReference<>();
@@ -486,7 +498,7 @@ public class QuerySalesforceObject extends AbstractProcessor {
         List<FlowFile> outgoingFlowFiles = new ArrayList<>();
         do {
             FlowFile outgoingFlowFile;
-            try (InputStream response = getResultInputStream(nextRecordsUrl.get(), customQuery)) {
+            try (InputStream response = getResultInputStream(nextRecordsUrl.get(), customQuery, queryAll)) {
                 if (originalFlowFile != null) {
                     outgoingFlowFile = session.create(originalFlowFile);
                 } else {
@@ -545,9 +557,9 @@ public class QuerySalesforceObject extends AbstractProcessor {
                 .equals(value) && jsonParser.nextToken() != null;
     }
 
-    private InputStream getResultInputStream(String nextRecordsUrl, String querySObject) {
+    private InputStream getResultInputStream(String nextRecordsUrl, String querySObject, boolean queryAll) {
         if (nextRecordsUrl == null) {
-            return salesforceRestService.query(querySObject);
+            return salesforceRestService.query(querySObject, queryAll);
         }
         return salesforceRestService.getNextRecords(nextRecordsUrl);
     }
