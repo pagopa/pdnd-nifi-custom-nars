@@ -31,7 +31,9 @@ import java.util.concurrent.TimeUnit;
         @WritesAttribute(attribute = DDBToJson.DDBK_PRINCIPAL_ID, description = "If UserIdentity is not null: Principal ID saved on DynamoDB JSON. Only for Kinesis mode."),
         @WritesAttribute(attribute = DDBToJson.DDBK_PRINCIPAL_TYPE, description = "If UserIdentity is not null: Principal Type saved on DynamoDB JSON. Only for Kinesis mode."),
         @WritesAttribute(attribute = DDBToJson.DDBK_RECORD_FORMAT, description = "Record Format saved on DynamoDB JSON. Only for Kinesis mode."),
-        @WritesAttribute(attribute = DDBToJson.DDBK_TABLE_NAME, description = "Table name saved on DynamoDB JSON. Only for Kinesis mode.")
+        @WritesAttribute(attribute = DDBToJson.DDBK_TABLE_NAME, description = "Table name saved on DynamoDB JSON. Only for Kinesis mode."),
+        @WritesAttribute(attribute = DDBToJson.DDBK_APPROXIMATE_CREATION_DATETIME, description = "ApproXimate Creation DateTime saved on DynamoDB JSON. Only for Kinesis mode.")
+        //ApprocimateCreationDateTime
 })
 
 public class DDBToJson extends AbstractProcessor {
@@ -44,6 +46,8 @@ public class DDBToJson extends AbstractProcessor {
     public static final String DDBK_AWS_REGION = "ddbk_aws_region";
     public static final String DDBK_RECORD_FORMAT = "ddbk_record_format";
     public static final String DDBK_TABLE_NAME = "ddbk_table_name";
+    public static final String DDBK_APPROXIMATE_CREATION_DATETIME = "ddbk_approximate_creation_datetime";
+
     private static final RecordObjectMapper MAPPER;
 
     private Parser parser;

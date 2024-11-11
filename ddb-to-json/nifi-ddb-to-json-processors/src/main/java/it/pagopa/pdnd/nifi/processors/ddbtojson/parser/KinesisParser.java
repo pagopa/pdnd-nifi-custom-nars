@@ -23,7 +23,9 @@ public class KinesisParser extends Parser{
     @Override
     public DynamoConvertedOutputJson parseContent(FlowFile flowFile, String content, Map<String, String> attributes) throws JsonProcessingException {
         DDBKRecord deserialized = objectMapper.readValue(content, DDBKRecord.class);
-        if (deserialized == null || deserialized.getDynamodb() == null || deserialized.getDynamodb().getNewImage() == null) {
+        //if (deserialized == null || deserialized.getDynamodb() == null || deserialized.getDynamodb().getNewImage() == null) {
+        if (deserialized == null || deserialized.getDynamodb() == null || ( deserialized.getDynamodb().getNewImage() == null && !deserialized.getEventName().equals("REMOVE")) || ( deserialized.getDynamodb().getOldImage() == null && deserialized.getEventName().equals("REMOVE"))  ) {  // NEW 
+
             logger.warn("Empty new image for FlowFile {}", flowFile);
             return new DynamoConvertedOutputJson.Builder()
                     .withFailRelationship(REL_WARN).build();
@@ -49,6 +51,9 @@ public class KinesisParser extends Parser{
             checkNullAndAdd(attributes, DDBK_PRINCIPAL_ID, record.getUserIdentity().getPrincipalId());
             checkNullAndAdd(attributes, DDBK_PRINCIPAL_TYPE, record.getUserIdentity().getType());
         }
+        if (record.getDynamodb() != null) {
+            checkNullAndAdd(attributes, DDBK_APPROXIMATE_CREATION_DATETIME, (Long.toString(record.getDynamodb().getApproximateCreationDateTime().toInstant().toEpochMilli())));
+        }
     }
 
     private void checkNullAndAdd(Map<String, String> attributes, String key, String value) {
@@ -56,11 +61,29 @@ public class KinesisParser extends Parser{
             attributes.put(key, value);
         }
     }
+    /* 
     private String prepareOutputJson(DDBKRecord deserialized) throws JsonProcessingException {
         Item ddbItem = ItemUtils.toItem(deserialized.getDynamodb().getNewImage());
         ObjectNode jsonNode = (ObjectNode) objectMapper.readTree(ddbItem.toJSON());
         jsonNode.put("eventID", deserialized.getEventID())
                 .put("eventName", deserialized.getEventName());
+        return jsonNode.toString();
+    }
+    */
+
+    private String prepareOutputJson(DDBKRecord deserialized) throws JsonProcessingException {
+        String eventName = deserialized.getEventName();
+        Item ddbItem;
+        if(eventName.equals("REMOVE")) {
+            ddbItem = ItemUtils.toItem(deserialized.getDynamodb().getOldImage());
+        } else {
+            ddbItem = ItemUtils.toItem(deserialized.getDynamodb().getNewImage());
+        }
+        ObjectNode jsonNode = (ObjectNode) objectMapper.readTree(ddbItem.toJSON());
+        jsonNode.put("eventID", deserialized.getEventID())
+                .put("eventName", deserialized.getEventName())
+                .put("approximateCreationDatetime", (Long.toString(deserialized.getDynamodb().getApproximateCreationDateTime().toInstant().toEpochMilli())));
+
         return jsonNode.toString();
     }
 
