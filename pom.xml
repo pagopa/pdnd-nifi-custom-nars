@@ -24,6 +24,7 @@
 
     <modules>
         <module>ddb-to-json</module>
+        <module>pdnd-nifi-salesforce-bundle</module>
     </modules>
 
     <dependencyManagement>
