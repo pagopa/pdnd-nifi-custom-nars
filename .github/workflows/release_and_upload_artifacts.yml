@@ -12,10 +12,10 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Get changed folders
         id: changed-files
-        uses: tj-actions/changed-files@v44
+        uses: tj-actions/changed-files@2d756ea4c53f7f6b397767d8723b3a10a9f35bf2 # v44
         with:
           dir_names: true
           dir_names_exclude_current_dir: true
@@ -46,10 +46,10 @@ jobs:
       run:
         working-directory: ${{ matrix.dir }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: List Sub-Folders
         id: modules
-        uses: kmanimaran/list-folder-action@v4
+        uses: kmanimaran/list-folder-action@6d9f96e7d8cfa8273c443f939f703c5190dbd2c8 # v4
         with:
           path: ${{ matrix.dir }}
       - name: finded modules
@@ -74,14 +74,14 @@ jobs:
       run:
         working-directory: ${{ matrix.dir }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     - name: Set up JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4
       with:
         java-version: '11'
         distribution: 'adopt'
     - name: Cache Maven packages
-      uses: actions/cache@v4
+      uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -106,11 +106,11 @@ jobs:
           done
         done
     - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       if: env.GENERATES_NAR == 'true'
       with:
         name: build-artifacts
         path: ${{ matrix.dir }}/artifacts/**/*
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4
       with:
         name: build-artifacts
