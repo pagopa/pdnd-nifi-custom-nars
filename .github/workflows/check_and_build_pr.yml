@@ -5,7 +5,7 @@ on:
 jobs:
   compute_diff:
     name: Compute diff on folders
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         id: checkout
@@ -33,7 +33,7 @@ jobs:
   find-modules:
     name: Find Modules
     if: ${{ needs.compute_diff.outputs.changed_dirs != '[]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: 
       - compute_diff
     timeout-minutes: 5
@@ -61,7 +61,7 @@ jobs:
   build:
     name: Build
     if: ${{ needs.compute_diff.outputs.changed_dirs != '[]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: 
       - compute_diff
       - find-modules
