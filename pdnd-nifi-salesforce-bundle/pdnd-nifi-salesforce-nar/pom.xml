@@ -19,7 +19,7 @@
     <parent>
         <groupId>it.pagopa.pdnd.nifi</groupId>
         <artifactId>pdnd-nifi-salesforce-bundle</artifactId>
-        <version>1.0.0</version>
+        <version>1.28.1</version>
     </parent>
 
     <artifactId>pdnd-nifi-salesforce-nar</artifactId>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>it.pagopa.pdnd.nifi</groupId>
             <artifactId>pdnd-nifi-salesforce-processors</artifactId>
-            <version>1.0.0</version>
+            <version>1.28.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.nifi</groupId>
             <artifactId>nifi-standard-services-api-nar</artifactId>
-            <version>1.21.0</version>
+            <version>1.28.1</version>
             <type>nar</type>
         </dependency>
     </dependencies>
