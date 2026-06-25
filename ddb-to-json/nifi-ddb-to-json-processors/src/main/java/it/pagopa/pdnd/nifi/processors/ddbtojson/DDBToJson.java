@@ -10,6 +10,7 @@ import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.behavior.WritesAttributes;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
+import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.components.AllowableValue;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
@@ -50,7 +51,7 @@ public class DDBToJson extends AbstractProcessor {
 
     private static final RecordObjectMapper MAPPER;
 
-    private Parser parser;
+    private volatile Parser parser;
 
     static {
         MAPPER = new RecordObjectMapper();
@@ -117,13 +118,14 @@ public class DDBToJson extends AbstractProcessor {
         return descriptors;
     }
 
+    @OnScheduled
+    public void onScheduled(final ProcessContext context) {
+        String parserType = context.getProperty(PROP_CONVERT).getValue();
+        parser = ParserFactory.createParser(parserType, MAPPER, getLogger());
+    }
+
     @Override
     public void onTrigger(final ProcessContext context, final ProcessSession session) {
-        if(parser == null) {
-            String parserType = context.getProperty(PROP_CONVERT).getValue();
-            parser = ParserFactory.createParser(parserType, MAPPER, getLogger());
-        }
-
 
         FlowFile flowFile = session.get();
         if (flowFile == null) {

@@ -9,7 +9,7 @@ import it.pagopa.pdnd.nifi.processors.ddbtojson.model.DDBKRecord;
 import it.pagopa.pdnd.nifi.processors.ddbtojson.model.DynamoConvertedOutputJson;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ComponentLog;
-import org.apache.nifi.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
